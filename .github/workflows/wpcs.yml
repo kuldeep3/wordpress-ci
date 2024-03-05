@@ -18,7 +18,7 @@ jobs:
             paths: ${{ github.event.pull_request.changed_files }}
         - name: Update summary
           run: |
-            touch ./phpcs.json
+            # touch ./phpcs.json
             npm i -g github:10up/phpcs-json-to-md
             phpcs-json-to-md --path ./phpcs.json --output ./phpcs.md
             cat phpcs.md >> $GITHUB_STEP_SUMMARY
