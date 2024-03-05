@@ -2,6 +2,7 @@ name: WordPress Coding Standard Check
 
 on: pull_request
 
+
 jobs:
   phpcs:
       name: VIPCS
