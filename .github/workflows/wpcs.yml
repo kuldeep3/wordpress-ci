@@ -1,0 +1,22 @@
+name: WordPress Coding Standard Check
+
+on: pull_request
+
+jobs:
+  phpcs:
+      name: VIPCS
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v3
+        - name: VIPCS check
+          uses: 10up/wpcs-action@stable
+          with:
+            standard: 'WordPress-VIP-Go'
+            use_local_config: true
+            extra_args: '--report-json=./phpcs-report.json'
+            paths: ${{ github.event.pull_request.changed_files }}
+        - name: Update summary
+          run: |
+            npx github:10up/phpcs-json-to-md --path ./phpcs-report.json --output ./phpcs-report.md
+            cat phpcs-report.md >> $GITHUB_STEP_SUMMARY
+          if: always()
