@@ -13,6 +13,5 @@ jobs:
           uses: 10up/wpcs-action@stable
           with:
             standard: 'WordPress-VIP-Go'
-            use_local_config: 'true'
             extra_args: '--report-json=./phpcs.json'
             paths: ${{ github.event.pull_request.changed_files }}
