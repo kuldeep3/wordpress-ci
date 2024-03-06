@@ -16,9 +16,3 @@ jobs:
             use_local_config: 'true'
             extra_args: '--report-json=./phpcs.json'
             paths: ${{ github.event.pull_request.changed_files }}
-        - name: Update summary
-          run: |
-            npm i -g github:10up/phpcs-json-to-md
-            phpcs-json-to-md --path ./phpcs.json --output ./phpcs.md
-            cat phpcs.md >> $GITHUB_STEP_SUMMARY
-          if: always()
