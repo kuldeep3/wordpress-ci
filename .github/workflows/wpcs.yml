@@ -2,6 +2,7 @@ name: WordPress Coding Standard Check
 
 on: pull_request
 
+
 jobs:
   phpcs:
       name: VIPCS
@@ -12,11 +13,11 @@ jobs:
           uses: 10up/wpcs-action@stable
           with:
             standard: 'WordPress-VIP-Go'
-            use_local_config: true
-            extra_args: '--report-json=./phpcs-report.json'
-            paths: ${{ github.event.pull_request.changed_files }}
+            use_local_config: 'true'
+            extra_args: '--report-json=./phpcs.json'
         - name: Update summary
           run: |
-            npx github:10up/phpcs-json-to-md --path ./phpcs-report.json --output ./phpcs-report.md
-            cat phpcs-report.md >> $GITHUB_STEP_SUMMARY
+            npm i -g github:10up/phpcs-json-to-md
+            phpcs-json-to-md --path ./phpcs.json --output ./phpcs.md
+            cat phpcs.md >> $GITHUB_STEP_SUMMARY
           if: always()
