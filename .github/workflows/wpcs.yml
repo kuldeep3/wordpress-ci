@@ -13,4 +13,3 @@ jobs:
           uses: 10up/wpcs-action@stable
           with:
             standard: 'WordPress-VIP-Go'
-            paths: ${{ github.event.pull_request.changed_files }}
