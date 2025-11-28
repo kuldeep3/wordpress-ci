@@ -115,3 +115,65 @@ add_action(
 	10,
 	3
 );
+
+add_filter(
+	'woocommerce_package_rates',
+	function ( $rates, $package ) {
+		if (
+			defined( 'DOING_AJAX' ) && DOING_AJAX &&
+			isset( $_REQUEST['wc-ajax'] ) &&
+			'wc_stripe_get_shipping_options' === $_REQUEST['wc-ajax']
+		) {
+			uasort(
+				$rates,
+				function ( $a, $b ) {
+					$costA = is_object( $a ) && method_exists( $a, 'get_cost' ) ? (float) $a->get_cost() : (float) ( $a->cost ?? 0 );
+					$costB = is_object( $b ) && method_exists( $b, 'get_cost' ) ? (float) $b->get_cost() : (float) ( $b->cost ?? 0 );
+					return $costA <=> $costB;
+				}
+			);
+
+			$only_supplements = function_exists( 'mwc_cart_contains_only_category' ) ? mwc_cart_contains_only_category( 'supplements' ) : false;
+
+			if ( $only_supplements ) {
+				$rates = (array) $rates;
+				reset( $rates );
+				$primary_rate_id = key( $rates );
+
+				if ( null !== $primary_rate_id ) {
+					$primary_rate = $rates[ $primary_rate_id ];
+					$label        = __( 'Shipping', 'megafitmeals' );
+
+					if ( is_object( $primary_rate ) ) {
+						if ( method_exists( $primary_rate, 'set_label' ) ) {
+							$primary_rate->set_label( $label );
+						} else {
+							$primary_rate->label = $label;
+						}
+
+						if ( method_exists( $primary_rate, 'set_cost' ) ) {
+							$primary_rate->set_cost( 0 );
+						} else {
+							$primary_rate->cost = 0;
+						}
+
+						if ( method_exists( $primary_rate, 'set_taxes' ) ) {
+							$primary_rate->set_taxes( array() );
+						} else {
+							$primary_rate->taxes = array();
+						}
+					} elseif ( is_array( $primary_rate ) ) {
+						$primary_rate['label'] = $label;
+						$primary_rate['cost']  = 0;
+						$primary_rate['taxes'] = array();
+						$rates[ $primary_rate_id ] = $primary_rate;
+					}
+
+					return array( $primary_rate_id => $primary_rate );
+				}
+			}
+		}
+		return $rates;
+	},
+	9999, 2
+);
